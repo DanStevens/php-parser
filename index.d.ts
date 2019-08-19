@@ -361,4 +361,98 @@ declare module "php-parser" {
     parseCode(buffer: String) : Program;
     tokenGetAll(buffer: String) : Token[];
   }
+
+  interface Identifier extends Node {
+    name: string;
+  }
+
+  interface Expression extends Node {
+  }
+
+  interface Literal extends Expression {
+    raw: string;
+    value:  Node | string | number | boolean | null;
+  }
+
+  interface _String extends Literal {
+    unicode: boolean;
+    isDoubleQuote: boolean;
+  }
+
+  interface Assign extends Expression {
+    left: Expression;
+    right: Expression;
+    operator: string;
+  }
+
+  interface Call extends Expression {
+    what: Identifier | Variable;
+    arguments: Array<Identifier>;
+  }
+
+  interface Lookup extends Expression {
+    what: Expression;
+    offset: Expression;
+  }
+
+  interface OffsetLookup extends Lookup {}
+
+  interface PropertyLookup extends Lookup {}
+
+  interface Variable extends Expression {
+    name: String | Node;  // The variable name (can be a complex expression when the name is resolved dynamically)
+    byref: boolean;       // Indicate if the variable reference is used, ex &$foo
+    curly: boolean;        // Indicate if the name is defined between curlies, ex ${foo}
+  }
+
+  interface Declaration extends Statement {
+    name: Identifier;
+  }
+
+  interface Statement extends Node {}
+
+  interface ExpressionStatement extends Statement {
+    expression: Expression;
+  }
+
+  interface Reference extends Node {}
+
+  interface ClassReference extends Reference {
+    name: string;
+    resolution: string;
+  }
+
+  interface Class extends Declaration {
+    kind: 'class';
+    extends: Identifier | null;
+    implements: Array<Identifier>;
+    body: Array<Declaration>;
+    isAnonymous: boolean;
+    isAbstract: boolean;
+    isFinal: boolean;
+  }
+
+  interface Parameter extends Declaration {
+    type: Identifier | null;
+    value: Node | null;
+    byref: boolean;
+    variadic: boolean;
+    nullable: boolean;
+  }
+
+  interface Function extends Declaration {
+    arguments: Array<Parameter>;
+    type: Identifier;
+    byref: boolean;
+    nullable: boolean;
+    body: Block | null ;
+  }
+
+  interface Method extends Function {
+    isAbstract: boolean;
+    isFinal: boolean;
+    isStatic: boolean;
+    visibility: string;
+  }
+
 }
